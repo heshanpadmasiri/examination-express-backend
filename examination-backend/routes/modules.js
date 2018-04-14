@@ -117,4 +117,33 @@ router.post('/registerToModule', passport.authenticate('jwt', { session: false }
    });
 });
 
+router.get('/moduleData', (req,res,next) => {
+    let moduleId = req.query.moduleId;
+    Module.getModulebyId(moduleId, (err,success) => {
+        if(err){
+            res.json({
+                success:false,
+                msg:err
+            });
+        } else {
+            res.json({
+                success: true,
+                msg:success
+            });
+        }
+    })
+});
+
+// todo: create endpoint to get overall results of a student
+
+// todo: add ability to submit papers
+
+// todo: handle moderation requests
+
+// todo: request re-correction end point
+
+// todo: module notifications
+
+
+
 module.exports = router;

@@ -58,7 +58,11 @@ module.exports.getModulebyId = function (id, callback) {
     db.collection('Modules').doc(id)
         .get()
         .then(snapshot => {
-            callback(null, snapshot.data())
+            if(snapshot.exists){
+                callback(null, snapshot.data());
+            } else {
+                callback('Invalid module code', null);
+            }
         });
 };
 
