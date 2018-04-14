@@ -65,16 +65,20 @@ module.exports.getModulebyId = function (id, callback) {
 * */
 module.exports.getRegisteredModules = function (userId, callback) {
   let registeredModules = [];
+  console.log(userId)
   db.collection('Modules')
       .get()
-      .then(docs.forEach(doc => {
-          let data = doc.data();
-          // Make sure registered students is not undefined
-          if(data.registeredStudents && data.registeredStudents.indexOf(userId) > -1){
-              registeredModules.push(data.moduleCode);
-          }
-      }));
-  callback(null, registeredModules);
+      .then(docs => {
+          docs.forEach(doc => {
+              let data = doc.data();
+              // Make sure registered students is not undefined
+              if(data.registeredStudents && data.registeredStudents.indexOf(userId) > -1){
+                  registeredModules.push(data.moduleCode);
+              }
+          });
+          callback(null, registeredModules);
+      });
+
 };
 
 /**
@@ -84,12 +88,14 @@ module.exports.getAdminModules = function (userId, callback) {
     let adminModules = [];
     db.collection('Modules')
         .get()
-        .then(docs.forEach(doc => {
-            let data = doc.data();
-            // Make sure registered students is not undefined
-            if(data.admins && data.admins.indexOf(userId) > -1){
-                adminModules.push(data.moduleCode);
-            }
-        }));
-    callback(null, adminModules);
+        .then(docs => {
+            docs.forEach(doc => {
+                let data = doc.data();
+                // Make sure registered students is not undefined
+                if(data.admins && data.admins.indexOf(userId) > -1){
+                    adminModules.push(data.moduleCode);
+                }
+            });
+            callback(null, adminModules);
+        });
 };
