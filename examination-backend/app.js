@@ -6,6 +6,8 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+const passport = require('passport');
+
 const admin = require('firebase-admin');
 const serviceAccount = require('./examination-system-cd948-firebase-adminsdk-n14fr-0934ade5a9.json');
 
@@ -34,6 +36,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+require('./config/passport')(passport);
 
 app.use('/', routes);
 app.use('/users', users);

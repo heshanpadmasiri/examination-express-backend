@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 const db = admin.firestore();
 
-/*
+/**
 * Use to set results or update them
 * */
 module.exports.updateResults = function (result,callback) {
@@ -9,28 +9,30 @@ module.exports.updateResults = function (result,callback) {
   // Make sure there is a module code
   if(moduleCode){
       let docRef = db.collection('Modules').doc(moduleCode);
-      let temp = docRef.data();
-      // check whether user have rights to modify results
-      if (temp.admins.indexOf(result.userId) > -1){
-          if(docRef.exists){
-              docRef.update({
-                  resultAvailable:true,
-                  lastEditedBy:result.userId,
-                  results: result.results
-              });
-              callback(null,{success:true});
+      // check whether user have rights to modify results and module exists
+      docRef.get().then(doc => {
+          if(doc.exists){
+              let temp = doc.data();
+              if (temp.admins.indexOf(result.userId) > -1) {
+                  docRef.update({
+                      resultAvailable: true,
+                      lastEditedBy: result.userId,
+                      results: result.results
+                  });
+                  callback(null, {success: true});
+              }else {
+                  callback('Permission denied', null);
+              }
           } else {
-              callback('No such Module', null);
+              callback('No such module', null);
           }
+      });
       } else {
-          callback('Permission denied', null);
-      }
-  } else {
       callback('Error no module Code',null);
-  }
+      }
 };
 
-/*
+/**
 * Use to create module in the database
 * module {
 *   moduleCode:string,
@@ -49,7 +51,7 @@ module.exports.createModule = function (module, callback) {
     }
 };
 
-/*
+/**
 * Use to get module by module Id assuming doc id is same as module id
 * */
 module.exports.getModulebyId = function (id, callback) {
@@ -60,12 +62,11 @@ module.exports.getModulebyId = function (id, callback) {
         });
 };
 
-/*
+/**
 * Use to get module ids of the module registered by a given id as a student
 * */
 module.exports.getRegisteredModules = function (userId, callback) {
   let registeredModules = [];
-  console.log(userId)
   db.collection('Modules')
       .get()
       .then(docs => {
@@ -98,4 +99,32 @@ module.exports.getAdminModules = function (userId, callback) {
             });
             callback(null, adminModules);
         });
+};
+
+/**
+ * Use to register for a given module
+ * */
+module.exports.registerToModule = function (userId,moduleId,callback) {
+    if(userId && moduleId){
+        let docRef = db.collection('Modules').doc(moduleId);
+        docRef.get().then(snapShot =>{
+            if(snapShot.exists){
+                let registeredStudents = snapShot.data().registeredStudents;
+                // make sure student haven't registered yet
+                if(registeredStudents.indexOf(userId) > -1){
+                    callback('Already registered', null);
+                } else {
+                    registeredStudents.push(userId);
+                    docRef.update({
+                        registeredStudents:registeredStudents
+                    });
+                    callback(null,true);
+                }
+            } else {
+                callback('No such module', null);
+            }
+        });
+    } else {
+        callback('userId and/or moduleId must be non empty',null);
+    }
 };

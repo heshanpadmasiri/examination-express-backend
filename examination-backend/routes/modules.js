@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
+const passport = require('passport');
 const Module = require('../models/Module');
 
-router.post('/createModule', (req,res,next) => {
+router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(req,res,next) => {
    let newModule = {
        moduleCode: req.body.moduleCode,
        admins: req.body.admins? req.body.admins:[],
@@ -69,6 +69,52 @@ router.get('/adminModules',(req,res,next)=>{
             msg: 'userId must be non empty'
         });
     }
+});
+
+router.post('/updateResults', passport.authenticate('jwt', { session: false }), (req,res,next) => {
+    let result = {
+        moduleCode:req.body.moduleCode,
+        userId:req.body.userId,
+        results:req.body.results
+    };
+    if(result.userId && result.moduleCode && result.results){
+        Module.updateResults(result, (err,success) => {
+            if (err){
+                res.json({
+                    success:false,
+                    msg: err
+                });
+            }  else {
+                res.json({
+                    success:true,
+                    msg: 'Successfully updated'
+                });
+            }
+        });
+    } else {
+        res.json({
+            success:false,
+            msg:'incomplete parameters'
+        });
+    }
+});
+
+router.post('/registerToModule', passport.authenticate('jwt', { session: false }), (req,res,next)=> {
+   let userId = req.body.userId;
+   let moduleId = req.body.moduleId;
+   Module.registerToModule(userId,moduleId,(err, success) => {
+       if(err){
+           res.json({
+               success:false,
+               msg:err
+           });
+       } else {
+           res.json({
+               success:true,
+               msg:'Successfully registered'
+           });
+       }
+   });
 });
 
 module.exports = router;
