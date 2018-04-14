@@ -83,4 +83,28 @@ router.post('/login',(req,res,next) => {
     });
 });
 
+router.get('/results', (req,res,next)=> {
+    let userId = req.query.userId;
+    if(userId){
+        User.getOverallResults(userId, (err, success) => {
+            if(err){
+                res.json({
+                    success:false,
+                    msg:err
+                });
+            } else {
+                res.json({
+                    success:true,
+                    msg:success
+                });
+            }
+        });
+    } else {
+        res.json({
+            success:false,
+            msg:"UserId must be non empty"
+        });
+    }
+});
+
 module.exports = router;
