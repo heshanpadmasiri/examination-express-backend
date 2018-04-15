@@ -180,3 +180,44 @@ module.exports.requestReCorrection = function(userId,moduleId,callback){
         callback('userId and/or moduleId must be non empty',null);
     }
 };
+
+/**
+ * Use to create module messages for every student who has registered to the module
+ * */
+exports.createModuleMessage = function (moduleId,authorId,message,callback) {
+    if(moduleId && authorId && message){
+        db.collection('Modules').doc(moduleId).get().then(doc => {
+            if(doc.exists){
+                let data = doc.data();
+                // make sure author is an admin
+                if(data.admins.indexOf(authorId) > -1){
+                    let _message = {
+                        type:'module message',
+                        content: message,
+                        author:authorId
+                    };
+                    each(data.registeredStudents,(student,_callback) => {
+                        Messages.createUserMessage(_message,student,(err,success) => {
+                            if(err){
+                                callback(err,null);
+                            }
+                            _callback();
+                        });
+                    }, (err) => {
+                        if(err){
+                            callback(err,null);
+                        } else {
+                            callback(null, 'successfully placed messages to all registered students');
+                        }
+                    });
+                } else {
+                    callback('you are not an admin of this module',null);
+                }
+            } else {
+                callback('no such module',null);
+            }
+        })
+    } else {
+        callback('moduleId, authorId and message must be non-empty',null)
+    }
+};

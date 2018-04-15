@@ -156,8 +156,24 @@ router.post('/re-correction', passport.authenticate('jwt', { session: false }), 
     });
 });
 
-// todo: module notifications
-
+router.post('/module-notification', passport.authenticate('jwt', {session:false}), (req,res,next)=>{
+   let message = req.body.message;
+   let moduleId = req.body.moduleId;
+   let authorID = req.body.userId;
+   Module.createModuleMessage(moduleId,authorID,message, (err,success)=> {
+       if(err){
+           res.json({
+               success:false,
+               msg:err
+           });
+       } else {
+           res.json({
+               success:true,
+               msg:success
+           });
+       }
+   });
+});
 
 
 module.exports = router;
