@@ -1,6 +1,8 @@
 const admin = require('firebase-admin');
 const db = admin.firestore();
 
+const Messages = require('../models/Messages');
+const each = require("async/each");
 /**
 * Use to set results or update them
 * */
@@ -128,6 +130,52 @@ module.exports.registerToModule = function (userId,moduleId,callback) {
                 callback('No such module', null);
             }
         });
+    } else {
+        callback('userId and/or moduleId must be non empty',null);
+    }
+};
+
+//todo: make sure student can place only one re-correction request per module
+/**
+ * Use to create a re-correction request
+ * */
+module.exports.requestReCorrection = function(userId,moduleId,callback){
+    if(userId && moduleId){
+        db.collection('Modules').doc(moduleId).get().then(doc => {
+            if(doc.exists){
+                let admins = doc.data().admins;
+                // make sure student has registered to the module
+                if(doc.data().registeredStudents.indexOf(userId) > -1){
+                    let message = {
+                        type: 're-correction request',
+                        content: userId + ' is requesting re-correction for module ' + moduleId,
+                        author: 'system'
+                    };
+                    if(admins && admins.length > 0){
+                        each(admins,(admin,_callback1) => {
+                            Messages.createUserMessage(message,admin,(err, success) => {
+                                if(err){
+                                    callback(err,null);
+                                } _callback1();
+                            });
+                        } , (err) => {
+                            if(err){
+                                callback(err,null);
+                            } else {
+                                callback(null, 'successfully placed re-correction request for all the admins');
+                            }
+                        })
+                    } else {
+                        callback('no admins specified for the module',null);
+                    }
+
+                } else {
+                    callback('student is not a registered student of this module',null);
+                }
+            } else {
+                callback('no such module', null);
+            }
+        })
     } else {
         callback('userId and/or moduleId must be non empty',null);
     }

@@ -134,13 +134,27 @@ router.get('/moduleData', (req,res,next) => {
     })
 });
 
-// todo: create endpoint to get overall results of a student
-
 // todo: add ability to submit papers
 
 // todo: handle moderation requests
 
-// todo: request re-correction end point
+router.post('/re-correction', passport.authenticate('jwt', { session: false }), (req,res,next) => {
+    let userId = req.body.userId;
+    let moduleId = req.body.moduleId;
+    Module.requestReCorrection(userId,moduleId, (err, success)=> {
+       if(err){
+           res.json({
+               success:false,
+               msg:err
+           });
+       } else {
+           res.json({
+               success:true,
+               msg:success
+           });
+       }
+    });
+});
 
 // todo: module notifications
 
