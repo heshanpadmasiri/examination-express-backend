@@ -3,7 +3,7 @@ const db = admin.firestore();
 
 
 /**
- * Use to create a message directly addressing an user
+ * Use to create a message directly addressing a user
  * Message should have content, type and author
  * */
 module.exports.createUserMessage = function (message,userId,callback) {
@@ -31,3 +31,21 @@ module.exports.createUserMessage = function (message,userId,callback) {
         callback('message and userId must be non empty',null);
     }
 };
+
+/**
+ * Use to get messages addressed to a user
+ * Return empty array if no messages
+ */
+module.exports.getUserMessages = function(userId, callback){
+    if(userId){
+        db.collection('Messages').doc(userId).get().then(doc => {
+            if(doc.exists){
+                callback(null, doc.data().messages);
+            } else {
+                callback(null, []);
+            }
+        });
+    } else {
+        callback('userId must be non-empty', null);
+    }
+}

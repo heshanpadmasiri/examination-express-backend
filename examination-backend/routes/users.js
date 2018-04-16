@@ -2,6 +2,7 @@
 const router = express.Router();
 
 const User = require('../models/User');
+const Messages = require('../models/Messages');
 const constants = require('../config/constants');
 const jwt = require('jsonwebtoken');
 
@@ -33,8 +34,6 @@ router.post('/register', (req, res, next) => {
         }
     });
 });
-
-
 
 // Authenticate
 router.post('/login',(req,res,next) => {
@@ -104,6 +103,23 @@ router.get('/results', (req,res,next)=> {
             msg:"UserId must be non empty"
         });
     }
+});
+
+router.get('/messages', (req,res,next) => {
+    let userId = req.query.userId;
+    Messages.getUserMessages(userId, (err,success) => {
+        if(err){
+            res.json({
+                success:false,
+                msg:err
+            });
+        } else {
+            res.json({
+                success:true,
+                msg:success
+            });
+        }
+    });
 });
 
 module.exports = router;
