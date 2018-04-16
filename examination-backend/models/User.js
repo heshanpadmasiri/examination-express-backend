@@ -9,13 +9,14 @@ const db = admin.firestore();
 /*
 * Used to create new users If a user by the Id exists will over write the user
 * */
-module.exports.addUser = function (newUser) {
+module.exports.addUser = function (newUser, callback) {
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw error;
+            if (err) throw err;
             newUser.password = hash;
             saveUser(newUser);
         });
+        callback(null, 'successfully created new user');
     })
 };
 
@@ -60,7 +61,15 @@ module.exports.comparePasswords = function(candidatePassword, hash, callback){
 
 // Use this to save new Users to the database
 function saveUser(newUser) {
-    let docRef = db.collection('Users').doc(newUser.username);
+    // set user type
+    if(newUser.id[0] === '2'){
+        newUser.type = 'academic';
+    } else if(newUser.id[0] === '3'){
+        newUser.type = 'admin';
+    } else {
+        newUser.type = 'student';
+    }
+    let docRef = db.collection('Users').doc(newUser.id);
     docRef.set(newUser);
 }
 

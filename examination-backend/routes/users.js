@@ -19,16 +19,16 @@ router.post('/register', (req, res, next) => {
         password: req.body.password,
         id: req.body.id
     };
-    User.addUser(newUser, (err, user) => {
+    User.addUser(newUser, (err, success) => {
         if (err) {
             res.json({
                 success: false,
-                msg: "Failed to register user"
+                msg: err
             });
         } else {
             res.json({
                 success: true,
-                msg: "User registered"
+                msg: success
             });
         }
     });
@@ -40,7 +40,7 @@ router.post('/register', (req, res, next) => {
 router.post('/login',(req,res,next) => {
     const username = req.body.username;
     const password = req.body.password;
-
+   
     User.getUserByUsername(username, (err, user) => {
         if(err) throw err;
         if(!user){
@@ -55,8 +55,6 @@ router.post('/login',(req,res,next) => {
         User.comparePasswords(password, user.password, (err, isMatch) => {
             if(err) throw err;
             if(isMatch){
-                console.log(user);
-                console.log(constants.jwtSecret);
                 const token = jwt.sign(user, constants.jwtSecret, {
                     expiresIn: 604800 // 1 week in seconds
                 });
@@ -67,7 +65,8 @@ router.post('/login',(req,res,next) => {
                         id: user.id,
                         name:user.name,
                         username:user.username,
-                        email:user.email
+                        email:user.email,
+                        type: user.type
                     },
                     msg: "User authenticated successfully"
                 });
