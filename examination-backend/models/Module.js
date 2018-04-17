@@ -141,37 +141,58 @@ module.exports.registerToModule = function (userId,moduleId,callback) {
  * */
 module.exports.requestReCorrection = function(userId,moduleId,callback){
     if(userId && moduleId){
-        db.collection('Modules').doc(moduleId).get().then(doc => {
+        let docRef = db.collection('Modules').doc(moduleId);
+        docRef.get().then(doc => {
             if(doc.exists){
                 let admins = doc.data().admins;
-                // make sure student has registered to the module
-                if(doc.data().registeredStudents.indexOf(userId) > -1){
-                    let message = {
-                        type: 're-correction request',
-                        content: userId + ' is requesting re-correction for module ' + moduleId,
-                        author: 'system'
-                    };
-                    if(admins && admins.length > 0){
-                        each(admins,(admin,_callback1) => {
-                            Messages.createUserMessage(message,admin,(err, success) => {
-                                if(err){
-                                    callback(err,null);
-                                } _callback1();
-                            });
-                        } , (err) => {
-                            if(err){
-                                callback(err,null);
-                            } else {
-                                callback(null, 'successfully placed re-correction request for all the admins');
+                let requested = doc.data().reCorrectionRequested;
+                // make sure results has been released for the module
+                if(doc.data().resultAvailable){
+                    // make sure student has registered to the module
+                    if(doc.data().registeredStudents.indexOf(userId) > -1){
+                        console.log(requested)
+                        // make sure student haven't request reCorrection
+                        if(requested === undefined || requested.indexOf(userId) < 0){
+                            // add the student to the requested list
+                            if(!requested){
+                                requested = []
                             }
-                        })
+                            requested.push(userId);
+                            docRef.update({
+                                reCorrectionRequested:requested
+                            });
+                            let message = {
+                                type: 're-correction request',
+                                content: userId + ' is requesting re-correction for module ' + moduleId,
+                                author: 'system'
+                            };
+                            if(admins && admins.length > 0){
+                                each(admins,(admin,_callback1) => {
+                                    Messages.createUserMessage(message,admin,(err, success) => {
+                                        if(err){
+                                            callback(err,null);
+                                        } _callback1();
+                                    });
+                                } , (err) => {
+                                    if(err){
+                                        callback(err,null);
+                                    } else {
+                                        callback(null, 'successfully placed re-correction request for all the admins');
+                                    }
+                                })
+                            } else {
+                                callback('no admins specified for the module',null);
+                            }
+                        } else {
+                            callback('you have already asked for re-correction',null);
+                        }
                     } else {
-                        callback('no admins specified for the module',null);
+                        callback('student is not a registered student of this module',null);
                     }
-
                 } else {
-                    callback('student is not a registered student of this module',null);
+                    callback('Results not released for this module',null);
                 }
+                
             } else {
                 callback('no such module', null);
             }
