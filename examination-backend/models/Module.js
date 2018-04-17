@@ -135,7 +135,6 @@ module.exports.registerToModule = function (userId,moduleId,callback) {
     }
 };
 
-//todo: make sure student can place only one re-correction request per module
 /**
  * Use to create a re-correction request
  * */
