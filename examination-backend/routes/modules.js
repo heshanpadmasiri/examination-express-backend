@@ -73,7 +73,7 @@ router.get('/adminModules',(req,res,next)=>{
 
 router.post('/updateResults', passport.authenticate('jwt', { session: false }), (req,res,next) => {
     let result = {
-        moduleCode:req.body.moduleCode,
+        moduleCode:req.body.moduleId,
         userId:req.body.userId,
         results:req.body.results
     };
