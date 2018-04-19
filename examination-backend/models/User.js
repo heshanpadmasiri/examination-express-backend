@@ -12,11 +12,19 @@ const db = admin.firestore();
 module.exports.addUser = function (newUser, callback) {
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            saveUser(newUser);
+            if (err){
+                callback(err, null);
+            } else {
+                newUser.password = hash;
+                saveUser(newUser, (_err,success)=> {
+                    if(_err){
+                        callback(_err, null);
+                    } else {
+                        callback(null, success);
+                    }
+                });
+            }
         });
-        callback(null, 'successfully created new user');
     })
 };
 
@@ -60,7 +68,7 @@ module.exports.comparePasswords = function(candidatePassword, hash, callback){
 };
 
 // Use this to save new Users to the database
-function saveUser(newUser) {
+function saveUser(newUser, callback) {
     // set user type
     if(newUser.id[0] === '2'){
         newUser.type = 'academic';
@@ -70,7 +78,14 @@ function saveUser(newUser) {
         newUser.type = 'student';
     }
     let docRef = db.collection('Users').doc(newUser.id);
-    docRef.set(newUser);
+    docRef.get().then(doc => {
+        if(doc.exists){
+            callback('UserId already exists', null);
+        } else {
+            docRef.set(newUser);
+            callback(null, 'User created');
+        }
+    });
 }
 
 /**
