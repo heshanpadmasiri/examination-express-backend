@@ -11,6 +11,23 @@ router.get('/', function (req, res) {
     res.send('respond with a resource');
 });
 
+router.get('/checkAvailbility', (req, res, next) => {
+    let userID = req.query.userId;
+    User.isAvailable(userID, (err, success) => {
+        if(err){
+            res.json({
+                success: false,
+                msg: err
+            });
+        } else {
+            res.json({
+                success: true,
+                msg: success
+            });
+        }
+    });
+});
+
 // Register new User
 router.post('/register', (req, res, next) => {
     let newUser = {

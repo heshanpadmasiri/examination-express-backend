@@ -28,6 +28,25 @@ module.exports.addUser = function (newUser, callback) {
     })
 };
 
+/**
+ * Use to chek if an account already registered by an id
+ */
+module.exports.isAvailable = function (userId, callback){
+    if(userId){
+        db.collection('Users').doc(userId)
+            .get()
+            .then(snapshot => {
+                if(snapshot.exists){
+                    callback(null, false);
+                } else {
+                    callback(null, true);
+                }
+            });        
+    } else {
+        callback('UserID must be non-empty', null);
+    }    
+}
+
 /*
 * Used to get the used by the user Id. It is assumed that doc id to be same as user id
 * */
