@@ -35,7 +35,11 @@ module.exports.getUserById = function (id, callback) {
   db.collection('Users').doc(id)
       .get()
       .then(snapshot => {
-          callback(null, snapshot.data())
+          if(snapshot.exists){
+            callback(null, snapshot.data());
+          } else {
+              callback('nosuch userId');
+          }          
       });
 };
 
@@ -48,7 +52,7 @@ module.exports.getUserByUsername = function (username, callback) {
         .get()
         .then(docs => {
             if(docs.size === 0) {
-                callback(null,null);
+                callback('No such user',null);
             }
             docs.forEach(doc => {
                 const match = doc.data();
@@ -62,8 +66,11 @@ module.exports.getUserByUsername = function (username, callback) {
 * */
 module.exports.comparePasswords = function(candidatePassword, hash, callback){
     bcrypt.compare(candidatePassword,hash, (error, isMatch) => {
-        if(error) console.log(err);
-        callback(null, isMatch);
+        if(error){
+            callback(error, null);
+        } else {            
+            callback(null, isMatch);
+        }
     });
 };
 
