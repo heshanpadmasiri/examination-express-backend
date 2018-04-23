@@ -26,6 +26,23 @@ router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(
    });
 });
 
+router.get('/moduleExists', (req,res,next) => {
+    let moduleId = req.query.mouduleId;
+    Module.isModuleExists(moduleId, (err, success) => {
+        if(err){
+            res.json({
+                success: false,
+                msg: err
+            });
+        } else {
+            res.json({
+                success: true,
+                msg: success
+            });
+        }
+    });
+});
+
 router.get('/registeredModule', (req,res,next) => {
    let userId = req.query.userId;
    if(userId){

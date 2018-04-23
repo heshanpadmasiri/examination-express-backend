@@ -34,6 +34,23 @@ module.exports.updateResults = function (result,callback) {
       }
 };
 
+module.exports.isModuleExists = function(moduleId, callback){
+    if (moduleId){
+        db.collection('Modules').doc(moduleId).get().then(snapShot => {
+            if(snapShot.exists){
+                callback(null, true);
+            } else {
+                callback(null, false);
+            }
+        }).catch(err => {
+            callback(err, null);
+        });
+    } else {
+        callback('ModuleId must be non-empty',null);
+    }
+   
+}
+
 /**
 * Use to create module in the database
 * module {
