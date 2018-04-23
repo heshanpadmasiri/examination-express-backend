@@ -28,6 +28,8 @@ module.exports.updateResults = function (result,callback) {
           } else {
               callback('No such module', null);
           }
+      }).catch(err => {
+          callback(err, null);
       });
       } else {
       callback('Error no module Code',null);
@@ -71,6 +73,8 @@ module.exports.createModule = function (module, callback) {
                 docRef.set(module);
                 callback(null, 'Module created successfully');
             }
+        }).catch(err => {
+            callback(err, null);
         });
     } else {
         callback('ModuleCode must be non empty',null);
@@ -89,6 +93,8 @@ module.exports.getModulebyId = function (id, callback) {
             } else {
                 callback('Invalid module code', null);
             }
+        }).catch(err => {
+            callback(err, null);
         });
 };
 
@@ -108,10 +114,13 @@ module.exports.getRegisteredModules = function (userId, callback) {
               }
           });
           callback(null, registeredModules);
+      }).catch(err => {
+          callback(err, null);
       });
 
 };
 
+//todo: make success callback called at the correct moment
 /**
  * Use to get module ids of modules where the user id is registered as an admin
  */
@@ -128,6 +137,8 @@ module.exports.getAdminModules = function (userId, callback) {
                 }
             });
             callback(null, adminModules);
+        }).catch(err => {
+            callback(err, null);
         });
 };
 
@@ -153,6 +164,8 @@ module.exports.registerToModule = function (userId,moduleId,callback) {
             } else {
                 callback('No such module', null);
             }
+        }).catch(err => {
+            callback(null, err);
         });
     } else {
         callback('userId and/or moduleId must be non empty',null);
@@ -219,7 +232,9 @@ module.exports.requestReCorrection = function(userId,moduleId,callback){
             } else {
                 callback('no such module', null);
             }
-        })
+        }).catch(err => {
+            callback(err, null);
+        });
     } else {
         callback('userId and/or moduleId must be non empty',null);
     }
@@ -260,7 +275,9 @@ exports.createModuleMessage = function (moduleId,authorId,message,callback) {
             } else {
                 callback('no such module',null);
             }
-        })
+        }).catch(err => {
+            callback(err, null);
+        });
     } else {
         callback('moduleId, authorId and message must be non-empty',null)
     }

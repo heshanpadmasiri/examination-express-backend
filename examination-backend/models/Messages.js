@@ -26,7 +26,9 @@ module.exports.createUserMessage = function (message,userId,callback) {
                 });
                 callback(null, 'successfully created a new message queue');
             }
-        })
+        }).catch(err => {
+            callback(err, null);
+        });
     } else {
         callback('message and userId must be non empty',null);
     }
@@ -44,6 +46,8 @@ module.exports.getUserMessages = function(userId, callback){
             } else {
                 callback(null, []);
             }
+        }).catch(err => {
+            callback(err, null);
         });
     } else {
         callback('userId must be non-empty', null);
