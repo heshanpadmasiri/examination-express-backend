@@ -18,7 +18,10 @@ router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(
                msg: error
            });
        } else {
-           res.json(success);
+           res.json({
+               success:true,
+               msg: success
+           });
        }
    });
 });

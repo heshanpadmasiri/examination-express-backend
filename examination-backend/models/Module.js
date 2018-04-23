@@ -46,8 +46,15 @@ module.exports.updateResults = function (result,callback) {
 * */
 module.exports.createModule = function (module, callback) {
     if(module.moduleCode){
-        db.collection('Modules').doc(module.moduleCode).set(module);
-        callback(null, {success:true,module:module});
+        let docRef = db.collection('Modules').doc(moudle.moduleCode);
+        docRef.get().then(snapShot => {
+            if(snapShot.exists){
+                callback('Module already exists', null);
+            } else {
+                docRef.set(module);
+                callback(null, 'Module created successfully');
+            }
+        });
     } else {
         callback('ModuleCode must be non empty',null);
     }
