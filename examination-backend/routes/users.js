@@ -6,11 +6,7 @@ const Messages = require('../models/Messages');
 const constants = require('../config/constants');
 const jwt = require('jsonwebtoken');
 
-/* GET users listing. */
-router.get('/', function (req, res) {
-    res.send('respond with a resource');
-});
-
+// endpoint to check if a userId is already in use
 router.get('/checkAvailbility', (req, res, next) => {
     let userID = req.query.userId;
     User.isAvailable(userID, (err, success) => {
@@ -28,7 +24,7 @@ router.get('/checkAvailbility', (req, res, next) => {
     });
 });
 
-// Register new User
+// endpoint to register new users
 router.post('/register', (req, res, next) => {
     let newUser = {
         name: req.body.name,
@@ -52,7 +48,7 @@ router.post('/register', (req, res, next) => {
     });
 });
 
-// Authenticate
+// endpoint to authenticate user
 router.post('/login',(req,res,next) => {
     const username = req.body.username;
     const password = req.body.password;
@@ -98,6 +94,7 @@ router.post('/login',(req,res,next) => {
     });
 });
 
+// endpoint to get overall results of a user
 router.get('/results', (req,res,next)=> {
     let userId = req.query.userId;
     if(userId){
@@ -122,6 +119,7 @@ router.get('/results', (req,res,next)=> {
     }
 });
 
+// endpoint to get messages addressed to a user
 router.get('/messages', (req,res,next) => {
     let userId = req.query.userId;
     Messages.getUserMessages(userId, (err,success) => {

@@ -3,6 +3,7 @@ const router = express.Router();
 const passport = require('passport');
 const Module = require('../models/Module');
 
+// Endpoint for creation of new module
 router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(req,res,next) => {
    let newModule = {
        moduleCode: req.body.moduleCode,
@@ -26,6 +27,7 @@ router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(
    });
 });
 
+// Endpoint to check if a module exists
 router.get('/moduleExists', (req,res,next) => {
     let moduleId = req.query.mouduleId;
     Module.isModuleExists(moduleId, (err, success) => {
@@ -43,6 +45,7 @@ router.get('/moduleExists', (req,res,next) => {
     });
 });
 
+// Endpoint for getting modules registered by a user
 router.get('/registeredModule', (req,res,next) => {
    let userId = req.query.userId;
    if(userId){
@@ -67,6 +70,7 @@ router.get('/registeredModule', (req,res,next) => {
    }
 });
 
+// Endpoint to get admin modules of a user
 router.get('/adminModules',(req,res,next)=>{
     let userId = req.query.userId;
     if(userId){
@@ -91,6 +95,7 @@ router.get('/adminModules',(req,res,next)=>{
     }
 });
 
+// Endpoint for updating resulsts
 router.post('/updateResults', passport.authenticate('jwt', { session: false }), (req,res,next) => {
     let result = {
         moduleCode:req.body.moduleId,
@@ -119,6 +124,7 @@ router.post('/updateResults', passport.authenticate('jwt', { session: false }), 
     }
 });
 
+// endpoint to register to a module
 router.post('/registerToModule', passport.authenticate('jwt', { session: false }), (req,res,next)=> {
    let userId = req.body.userId;
    let moduleId = req.body.moduleId;
@@ -137,6 +143,7 @@ router.post('/registerToModule', passport.authenticate('jwt', { session: false }
    });
 });
 
+// endpoint to get information about a module
 router.get('/moduleData', (req,res,next) => {
     let moduleId = req.query.moduleId;
     Module.getModulebyId(moduleId, (err,success) => {
@@ -158,6 +165,7 @@ router.get('/moduleData', (req,res,next) => {
 
 // todo: handle moderation requests
 
+// endpoint for submitting recorrection requests
 router.post('/re-correction', passport.authenticate('jwt', { session: false }), (req,res,next) => {
     let userId = req.body.userId;
     let moduleId = req.body.moduleId;
@@ -176,6 +184,7 @@ router.post('/re-correction', passport.authenticate('jwt', { session: false }), 
     });
 });
 
+// endpoint for setting up module notifications
 router.post('/module-notification', passport.authenticate('jwt', {session:false}), (req,res,next)=>{
    let message = req.body.message;
    let moduleId = req.body.moduleId;

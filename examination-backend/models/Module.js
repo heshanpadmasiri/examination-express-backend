@@ -3,37 +3,38 @@ const db = admin.firestore();
 
 const Messages = require('../models/Messages');
 const each = require("async/each");
+
 /**
 * Use to set results or update them
 * */
 module.exports.updateResults = function (result,callback) {
-  let moduleCode = result.moduleCode;
-  // Make sure there is a module code
-  if(moduleCode){
-      let docRef = db.collection('Modules').doc(moduleCode);
-      // check whether user have rights to modify results and module exists
-      docRef.get().then(doc => {
-          if(doc.exists){
-              let temp = doc.data();
-              if (temp.admins.indexOf(result.userId) > -1) {
-                  docRef.update({
-                      resultAvailable: true,
-                      lastEditedBy: result.userId,
-                      results: result.results
-                  });
-                  callback(null, {success: true});
-              }else {
-                  callback('Permission denied', null);
-              }
-          } else {
-              callback('No such module', null);
-          }
-      }).catch(err => {
-          callback(err, null);
-      });
-      } else {
-      callback('Error no module Code',null);
-      }
+    let moduleCode = result.moduleCode;
+    // Make sure there is a module code
+    if(moduleCode){
+        let docRef = db.collection('Modules').doc(moduleCode);
+        // check whether user have rights to modify results and module exists
+        docRef.get().then(doc => {
+            if(doc.exists){
+                let temp = doc.data();
+                if (temp.admins.indexOf(result.userId) > -1) {
+                    docRef.update({
+                        resultAvailable: true,
+                        lastEditedBy: result.userId,
+                        results: result.results
+                    });
+                    callback(null, {success: true});
+                }else {
+                    callback('Permission denied', null);
+                }
+            } else {
+                callback('No such module', null);
+            }
+        }).catch(err => {
+            callback(err, null);
+        });
+        } else {
+        callback('Error no module Code',null);
+        }
 };
 
 module.exports.isModuleExists = function(moduleId, callback){
@@ -102,25 +103,24 @@ module.exports.getModulebyId = function (id, callback) {
 * Use to get module ids of the module registered by a given id as a student
 * */
 module.exports.getRegisteredModules = function (userId, callback) {
-  let registeredModules = [];
-  db.collection('Modules')
-      .get()
-      .then(docs => {
-          docs.forEach(doc => {
-              let data = doc.data();
-              // Make sure registered students is not undefined
-              if(data.registeredStudents && data.registeredStudents.indexOf(userId) > -1){
-                  registeredModules.push(data.moduleCode);
-              }
-          });
-          callback(null, registeredModules);
-      }).catch(err => {
-          callback(err, null);
-      });
+    let registeredModules = [];
+    db.collection('Modules')
+        .get()
+        .then(docs => {
+            docs.forEach(doc => {
+                let data = doc.data();
+                // Make sure registered students is not undefined
+                if(data.registeredStudents && data.registeredStudents.indexOf(userId) > -1){
+                    registeredModules.push(data.moduleCode);
+                }
+            });
+            callback(null, registeredModules);
+        }).catch(err => {
+            callback(err, null);
+        });
 
 };
 
-//todo: make success callback called at the correct moment
 /**
  * Use to get module ids of modules where the user id is registered as an admin
  */

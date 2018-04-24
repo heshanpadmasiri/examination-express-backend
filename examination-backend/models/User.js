@@ -52,14 +52,17 @@ module.exports.isAvailable = function (userId, callback){
 * */
 module.exports.getUserById = function (id, callback) {
   db.collection('Users').doc(id)
-      .get()
-      .then(snapshot => {
-          if(snapshot.exists){
+        .get()
+        .then(snapshot => {
+            if(snapshot.exists){
             callback(null, snapshot.data());
-          } else {
-              callback('nosuch userId');
-          }          
-      });
+            } else {
+                callback('nosuch userId');
+            }          
+        })
+        .catch(err => {
+            callback(err,null);
+        });
 };
 
 /*
@@ -77,6 +80,9 @@ module.exports.getUserByUsername = function (username, callback) {
                 const match = doc.data();
                 callback(null, match)
             });
+        })
+        .catch(err => {
+            callback(err,null);
         });
 };
 
@@ -111,7 +117,10 @@ function saveUser(newUser, callback) {
             docRef.set(newUser);
             callback(null, 'User created');
         }
-    });
+    })
+    .catch(err => {
+        callback(err,null);
+    });;
 }
 
 /**
@@ -130,7 +139,7 @@ module.exports.getOverallResults = function (userId, callback) {
                         _callback();
                     } else {
                         if (_success.resultAvailable) {
-                            each(_success.results, function (result, _callback2) {
+                            each(_success.results, (result, _callback2) => {
                                 if (result[userId]) {
                                     overallResults.push({
                                         module: moduleId,
@@ -140,9 +149,8 @@ module.exports.getOverallResults = function (userId, callback) {
                                 } else {
                                     _callback2();
                                 }
-                            } , function (err) {
+                            }, (err) => {
                                 if(err){
-                                    console.log(err);
                                     callback(err,null);
                                     _callback();
                                 } else {
@@ -154,9 +162,8 @@ module.exports.getOverallResults = function (userId, callback) {
                         }
                     }
                 });
-            }, function (err) {
+            }, (err) => {
                 if (err) {
-                    console.log(err);
                     callback(err, null);
                 } else {
                     callback(null, overallResults);
