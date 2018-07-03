@@ -5,13 +5,13 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-
 const compression = require('compression');
-
 const passport = require('passport');
-
 const admin = require('firebase-admin');
 const serviceAccount = require('./examination-system-cd948-firebase-adminsdk-n14fr-0934ade5a9.json');
+const cors = require('cors');
+
+
 
 // initialize firebase admin
 admin.initializeApp({
@@ -24,6 +24,8 @@ const users = require('./routes/users');
 const modules = require('./routes/modules');
 
 const app = express();
+
+app.use(cors({origin:true}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
