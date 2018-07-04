@@ -5,6 +5,7 @@ const Module = require('../models/Module');
 
 // Endpoint for creation of new module
 router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(req,res,next) => {
+   console.log(req.body);
    let newModule = {
        moduleCode: req.body.moduleCode,
        admins: req.body.admins? req.body.admins:[],

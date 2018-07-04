@@ -24,6 +24,23 @@ router.get('/checkAvailbility', (req, res, next) => {
     });
 });
 
+// endpoint to get list of academic users
+router.get('/academicUsers', (req, res, next) => {
+    User.getAcademicsUsers((err, success) => {
+        if(err){
+            res.json({
+                success: false,
+                msg: err
+            });
+        } else {
+            res.json({
+                success: true,
+                msg: success
+            });
+        }
+    })
+})
+
 // endpoint to register new users
 router.post('/register', (req, res, next) => {
     let newUser = {
@@ -54,7 +71,14 @@ router.post('/login',(req,res,next) => {
     const password = req.body.password;
    
     User.getUserByUsername(username, (err, user) => {
-        if(err) throw err;
+        if(err) {
+            return res.json({
+                success:false,
+                token:null,
+                user:null,
+                msg: err
+            })
+        }
         if(!user){
             return res.json({
                 success:false,

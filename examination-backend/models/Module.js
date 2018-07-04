@@ -65,8 +65,9 @@ module.exports.isModuleExists = function(moduleId, callback){
 * }
 * */
 module.exports.createModule = function (module, callback) {
+    console.log(module.moduleCode)
     if(module.moduleCode){
-        let docRef = db.collection('Modules').doc(moudle.moduleCode);
+        let docRef = db.collection('Modules').doc(module.moduleCode);
         docRef.get().then(snapShot => {
             if(snapShot.exists){
                 callback('Module already exists', null);

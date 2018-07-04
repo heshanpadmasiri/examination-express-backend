@@ -86,6 +86,26 @@ module.exports.getUserByUsername = function (username, callback) {
         });
 };
 
+/**
+ * Used to get a list of all the academic users in the system
+ */
+module.exports.getAcademicsUsers = function(callback){
+    userIds = []
+    db.collection('Users').where('type', '==', 'academic')
+        .get()
+        .then(docs => {
+            docs.forEach(doc => {
+                if(doc.exists){
+                    userIds.push(doc.data().id);
+                } 
+            });
+            callback(null, userIds);
+        })
+        .catch(err => {
+            callback(err, null);
+        })
+}
+
 /*
 * Used to compare password hash stored in the database against the plaintext password given
 * */
