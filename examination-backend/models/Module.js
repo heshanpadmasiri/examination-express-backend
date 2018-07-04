@@ -84,6 +84,38 @@ module.exports.createModule = function (module, callback) {
 };
 
 /**
+ * Use to record upload data to the database
+ */
+module.exports.recordUpload = function(moduleId, fileName, callback){
+    if(moduleId === null || fileName === null){
+        callback('moduleId and file name must be non empty', null);
+    } else {
+        const docRef = db.collection('Files').doc(moduleId);
+        docRef.get()
+        .then(snapshot => {
+            fileList = [fileName];
+            data = {
+                fileList:fileList
+            };
+            if(snapshot.exists){
+                // update the uploaded files
+                let data = snapshot.data();
+                fileList = data.files;
+                fileList.push(fileName);
+                docRef.update(data);
+            } else {
+                docRef.set(data)
+            }
+            
+            callback(null, 'Database updated successfully');
+        }).catch(err => {
+            console.log(err);
+            callback(err,null);
+        });
+    }  
+}
+
+/**
 * Use to get module by module Id assuming doc id is same as module id
 * */
 module.exports.getModulebyId = function (id, callback) {

@@ -164,6 +164,24 @@ router.get('/moduleData', (req,res,next) => {
 
 // todo: add ability to submit papers
 
+router.post('/file-upload', passport.authenticate('jwt', { session: false }), (req,res,next) => {
+    let moduleId = req.body.moduleId;
+    let fileName = req.body.fileName;
+    Module.recordUpload(moduleId,fileName,(err, success)=>{
+        if(err){
+            res.json({
+                success:false,
+                msg:err
+            });
+        } else {
+            res.json({
+                success:true,
+                msg:success
+            });
+        }
+    });
+});
+
 // todo: handle moderation requests
 
 // endpoint for submitting recorrection requests
