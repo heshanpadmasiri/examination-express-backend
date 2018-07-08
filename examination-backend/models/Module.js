@@ -84,6 +84,30 @@ module.exports.createModule = function (module, callback) {
 };
 
 /**
+ * Use to delete the record of a file from the database
+ */
+module.exports.deleteFileRecord = function(moduleId,fileName,callback){
+    if(moduleId === null || fileName === null){
+        return callback('Module ID and file name must be non empty', null);
+    } else {
+        const docRef = db.collection('Files').doc(moduleId);
+        docRef.get()
+        .then(snapshot => {
+            let data = snapshot.data();
+            fileList = data.fileList;
+            let index = fileList.indexOf(fileName);
+            fileList.splice(index,1);
+            docRef.update(data);
+            return callback(null, 'File remove successfully');
+        })
+        .catch(err => {
+            console.log(err);
+            callback(err, null);
+        })
+    }
+}
+
+/**
  * Use to record upload data to the database
  */
 module.exports.recordUpload = function(moduleId, fileName, callback){
@@ -100,7 +124,7 @@ module.exports.recordUpload = function(moduleId, fileName, callback){
             if(snapshot.exists){
                 // update the uploaded files
                 let data = snapshot.data();
-                fileList = data.files;
+                fileList = data.fileList;
                 fileList.push(fileName);
                 docRef.update(data);
             } else {

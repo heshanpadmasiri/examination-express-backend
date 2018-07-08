@@ -198,6 +198,25 @@ router.get('/file-list' ,passport.authenticate('jwt', { session: false }), (req,
     });
 });
 
+// endpoint to delete file from the database
+router.post('/delete-file',passport.authenticate('jwt', { session: false }), (req,res,next) => {
+    let moduleId = req.body.moduleId;
+    let fileName = req.body.fileName;
+    Module.deleteFileRecord(moduleId,fileName,(err,success)=>{
+        if(err){
+            res.json({
+                success:false,
+                msg:err
+            });
+        } else {
+            res.json({
+                success:true,
+                msg:success
+            });
+        }
+    });
+});
+
 // endpoint to update datebase about file uploads
 router.post('/file-upload', passport.authenticate('jwt', { session: false }), (req,res,next) => {
     let moduleId = req.body.moduleId;
@@ -216,8 +235,6 @@ router.post('/file-upload', passport.authenticate('jwt', { session: false }), (r
         }
     });
 });
-
-// todo: handle moderation requests
 
 // endpoint for submitting recorrection requests
 router.post('/re-correction', passport.authenticate('jwt', { session: false }), (req,res,next) => {
