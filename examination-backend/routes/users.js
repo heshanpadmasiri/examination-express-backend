@@ -92,7 +92,7 @@ router.post('/login',(req,res,next) => {
             if(err) throw err;
             if(isMatch){
                 const token = jwt.sign(user, constants.jwtSecret, {
-                    expiresIn: 604800 // 1 week in seconds
+                    expiresIn: 10800 // 3 hours in seconds
                 });
                 res.json({
                     success:true,

@@ -293,23 +293,12 @@ module.exports.requestReCorrection = function(userId,moduleId,callback){
                                 content: userId + ' is requesting re-correction for module ' + moduleId,
                                 author: 'system'
                             };
-                            if(admins && admins.length > 0){
-                                each(admins,(admin,_callback1) => {
-                                    Messages.createUserMessage(message,admin,(err, success) => {
-                                        if(err){
-                                            callback(err,null);
-                                        } _callback1();
-                                    });
-                                } , (err) => {
-                                    if(err){
-                                        callback(err,null);
-                                    } else {
-                                        callback(null, 'successfully placed re-correction request for all the admins');
-                                    }
-                                })
-                            } else {
-                                callback('no admins specified for the module',null);
-                            }
+                            Messages.createUserMessage(message,admins,(err, success) => {
+                                if(err){
+                                    console.log(err);
+                                }
+                            });                           
+                            callback(null,'Successfully placed a recorrection request');
                         } else {
                             callback('you have already asked for re-correction',null);
                         }
