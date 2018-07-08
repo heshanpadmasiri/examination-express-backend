@@ -116,6 +116,25 @@ module.exports.recordUpload = function(moduleId, fileName, callback){
 }
 
 /**
+ * Use to get list of files uploaded for a given module
+ */
+module.exports.getFileList = function(moduleId, callback){
+    if(moduleId === null){
+        callback('ModuleId must be non empty', null)
+    } else {
+        db.collection('Files').doc(moduleId).get().then(snapshot => {
+            fileList = []
+            if(snapshot.exists){
+                fileList = snapshot.data().fileList;
+            }
+            callback(null, fileList);
+        }).catch(err => {
+            callback(err, null);
+        });
+    }
+}
+
+/**
 * Use to get module by module Id assuming doc id is same as module id
 * */
 module.exports.getModulebyId = function (id, callback) {
@@ -204,6 +223,21 @@ module.exports.registerToModule = function (userId,moduleId,callback) {
         callback('userId and/or moduleId must be non empty',null);
     }
 };
+
+/**
+ * Use to get a list of all the existing modules
+ */
+module.exports.getModuleList = function(callback){
+    modules = []
+    db.collection('Modules').get().then(docs=> {
+        docs.forEach(doc => {
+            modules.push(doc.data().moduleCode);
+        });
+        callback(null, modules);
+    }).catch(err=>{
+        callback(err, null);
+    });
+}
 
 /**
  * Use to create a re-correction request

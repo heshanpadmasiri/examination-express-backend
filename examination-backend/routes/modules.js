@@ -28,6 +28,24 @@ router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(
    });
 });
 
+// Endpoint to get a list of all modules
+router.get('/get-modules', (req,res,next) => {
+    console.log('tt')
+    Module.getModuleList((err, success) => {
+        if(err){
+            res.json({
+                success:false,
+                msg:err
+            });
+        }else {
+            res.json({
+                success:true,
+                msg:success
+            });
+        }
+    });
+});
+
 // Endpoint to check if a module exists
 router.get('/moduleExists', (req,res,next) => {
     let moduleId = req.query.mouduleId;
@@ -162,8 +180,25 @@ router.get('/moduleData', (req,res,next) => {
     })
 });
 
-// todo: add ability to submit papers
+//endpoint to get the list of files uploaded for a module
+router.get('/file-list' ,passport.authenticate('jwt', { session: false }), (req,res,next) => {
+    let moduleId = req.query.moduleId;
+    Module.getFileList(moduleId, (err, success)=>{
+        if(err){
+            res.json({
+                success: false,
+                msg: err
+            });
+        } else {
+            res.json({
+                success: true,
+                msg:success
+            });
+        }
+    });
+});
 
+// endpoint to update datebase about file uploads
 router.post('/file-upload', passport.authenticate('jwt', { session: false }), (req,res,next) => {
     let moduleId = req.body.moduleId;
     let fileName = req.body.fileName;
