@@ -30,7 +30,6 @@ router.post('/createModule', passport.authenticate('jwt', { session: false }) ,(
 
 // Endpoint to get a list of all modules
 router.get('/get-modules', (req,res,next) => {
-    console.log('tt')
     Module.getModuleList((err, success) => {
         if(err){
             res.json({
